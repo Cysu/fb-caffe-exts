@@ -1,30 +1,37 @@
-## Torch to Caffe Model Converter
+# Torch to Caffe Model Converter
 (forked from [Cysu's branch](https://github.com/Cysu/fb-caffe-exts), originally from [fb-caffe-exts](https://github.com/facebook/fb-caffe-exts)) 
+ 
+:x: **I have stopped maintaining this repo. If you still want to use the converter, please use the AWS option:**
+  
+The easiest option is to launch an AWS EC2 g2.2xlarge instance I created. Choose N.California Sever and search for the instance name of FB-Torch2Caffe (ami-03542e63). [You can follow the [AWS tutorial](http://cs231n.github.io/aws-tutorial/)]
 
 ### Get Started
-0. The easiest option is to launch an AWS EC2 g2.2xlarge instance I created. Choose N.California Sever and search for the instance name of FB-Torch2Caffe (ami-03542e63). [You can follow the [AWS tutorial](http://cs231n.github.io/aws-tutorial/)]
 0. Please make sure Torch and Caffe (with pycaffe and python layer) are correctly installed.
 0. Download the code and install the dependencies
-  ```bash
-  git clone https://github.com/zhanghang1989/fb-caffe-exts.git
-  sudo bash install-dep.sh
-  ```
   
+    ```bash
+    git clone https://github.com/zhanghang1989/fb-caffe-exts.git
+    sudo bash install-dep.sh
+    ```
+
 0. Add Environment Variables (Change the path for your own machine)
-  ```bash
-  echo "export LD_PRELOAD=/path/to/libcaffe.so; export PYTHONPATH=$PYTHONPATH:/path/to/caffe/python/:/path/to/fb-caffe-exts/;" >>~/.bashrc && source ~/.bashrc
-  source ~/.bashrc
-  ```
+  
+    ```bash
+    echo "export LD_PRELOAD=/path/to/libcaffe.so; export PYTHONPATH=$PYTHONPATH:/path/to/caffe/python/:/path/to/fb-caffe-exts/;" >>~/.bashrc && source ~/.bashrc
+    source ~/.bashrc
+    ```
   
 0. Convert your first model:
-  ```bash
-  th convert.lua torch_model.t7b
-  ```
+  
+    ```bash
+    th convert.lua torch_model.t7b
+    ```
   
 0. Or custormize the conversion:
-  ```bash
-  th torch2caffe/torch2caffe.lua --input torch_model.t7b --preprocessing prepnv.lua --prototxt name.prototxt --caffemodel name.caffemodel --input_dims 1 3 224 224
-  ```
+  
+    ```bash
+    th torch2caffe/torch2caffe.lua --input torch_model.t7b --preprocessing prepnv.lua --prototxt name.prototxt --caffemodel name.caffemodel --input_dims 1 3 224 224
+    ```
 
 ### The Layers We Added Support
 0. ``ELU`` 
