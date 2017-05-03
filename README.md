@@ -6,8 +6,9 @@
 The easiest option is to launch an AWS EC2 g2.2xlarge instance I created. Choose N.California Sever and search for the instance name of FB-Torch2Caffe (ami-03542e63). [You can follow the [AWS tutorial](http://cs231n.github.io/aws-tutorial/)]
 
 ### Get Started
+
 0. Please make sure Torch and Caffe (with pycaffe and python layer) are correctly installed.
-0. Download the code and install the dependencies
+0. Download the code and install the dependencies (:x: **If you still would like to set it up on you own workstation, please follow the steps here to install dependencies (https://github.com/facebook/fbcunn/blob/master/INSTALL.md). Good luck!**)
   
     ```bash
     git clone https://github.com/zhanghang1989/fb-caffe-exts.git
