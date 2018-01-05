@@ -224,6 +224,8 @@ M.CONVERTER = {
             return layer
         end},
     ['nn.Dropout'] = simple{typename='caffe.Dropout', inplace=true},
+    ['nn.ELU'] = simple{typename='caffe.ELU', inplace=true},
+    ['nn.SpatialDropout'] = simple{typename='caffe.Power', inplace=true},
     ['nn.View'] = simple{
         typename='caffe.Flatten',
         layer=function(layer)
@@ -272,7 +274,7 @@ M.CONVERTER = {
                           false))
     end,
     ['nn.SpatialBatchNormalization'] = simple{
-        typename='caffe.BN'
+        typename='caffe.BatchNorm'--'caffe.BN'
     },
     ['nn.MulConstant'] = simple{
         typename="caffe.Power",

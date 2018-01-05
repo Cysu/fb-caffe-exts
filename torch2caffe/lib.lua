@@ -53,9 +53,7 @@ local function debug_nets(caffe_net, torch_net)
                     sums = torch.sum(m.output)
                 end
                 print("Layer %s, %s, Sum: %s",
-                              torch.typename(m),
-                              sizes,
-                              sums)
+                                    torch.typename(m), sizes, sums)
             end
         end
     )
@@ -104,7 +102,7 @@ function M.compare(opts, torch_net)
             torch_outputs = torch_net:forward(torch_inputs)
     end)
     if not ok then
-        print("Got error running forward: %s", err)
+        print("\n\n\nGot error running forward: %s", err)
         torch_net:cuda()
         local torch_inputs = inputs_to_torch_inputs(
             inputs, 'torch.CudaTensor')
@@ -120,8 +118,8 @@ function M.compare(opts, torch_net)
     end
 
     if #caffe_outputs ~= #torch_outputs then
-        error("Inconsistent output blobs: Caffe: %s, Torch: %s",
-                       #caffe_outputs, #torch_outputs)
+        error(string.format("Inconsistent output blobs: Caffe: %s, Torch: %s",
+                       #caffe_outputs, #torch_outputs))
         error("Inconsistent output blobs")
     end
 
@@ -129,22 +127,24 @@ function M.compare(opts, torch_net)
         local torch_output = torch_outputs[i]
         local caffe_output = caffe_outputs[i]
         print("Caffe norm: %s, Torch norm: %s",
-                      torch.norm(caffe_output), torch.norm(torch_output))
+                            torch.norm(caffe_output), torch.norm(torch_output))
         if not caffe_output:isSameSizeAs(torch_output) then
-            error("Inconsistent output size: Caffe: %s, Torch: %s",
-                           caffe_output:size(), torch_output:size())
+            error(string.format("Inconsistent output size: Caffe: %s, Torch: %s",
+                                caffe_output:size(), torch_output:size()))
             error("Inconsistent output sizes")
         end
 
         local max_absolute_error = (caffe_output - torch_output):abs():max()
         print("Maximum difference between Caffe and Torch output: %s",
                       max_absolute_error)
-        if (max_absolute_error > 0.001) then
+        if 1 then --(max_absolute_error > 0.001) then
             debug_nets(caffe_net, torch_net)
             if os.getenv('LUA_DEBUG_ON_ERROR') then
                 require('fb.debugger').enter()
             end
-            error("Error in conversion!")
+            if (max_absolute_error > 0.001) then  
+                error("Error in conversion!")
+            end
         end
     end
     if os.getenv('LUA_DEBUG_ON_ERROR') then

@@ -84,7 +84,7 @@ def inner_product(torch_layer):
     num_output = int(torch_layer["num_output"])
     weight = torch_layer["weight"]
     layer.inner_product_param.num_output = num_output
-    layer.inner_product_param.axis = -1
+    # layer.inner_product_param.axis = -1
     if "bias" in torch_layer:
         bias = torch_layer["bias"]
         layer.blobs.extend([as_blob(weight), as_blob(bias)])
@@ -174,9 +174,9 @@ def pooling(torch_layer):
 
     if not torch_layer["ceil_mode"]:
         # layer.pooling_param.torch_pooling = True
-        if dH > 1:
+        if dH > 1 and padH > 0:
             layer.pooling_param.pad_h = padH - 1
-        if dW > 1:
+        if dW > 1 and padW > 0:
             layer.pooling_param.pad_w = padW - 1
     return layer
 
@@ -186,12 +186,25 @@ def dropout(torch_layer):
     layer = pb2.LayerParameter()
     layer.type = "Dropout"
     layer.dropout_param.dropout_ratio = torch_layer["p"]
-    assert torch_layer["v2"], "Only handle nn.Dropout v2"
+    #assert torch_layer["v2"], "Only handle nn.Dropout v2"
     train_only = pb2.NetStateRule()
     train_only.phase = pb2.TEST
     layer.exclude.extend([train_only])
     return layer
 
+def elu(torch_layer):
+    layer = pb2.LayerParameter()
+    layer.type = "ELU"
+    layer.elu_param.alpha = torch_layer["alpha"]
+    return layer
+
+def power(torch_layer):
+    layer = pb2.LayerParameter()
+    layer.type = "Power"
+    layer.power_param.power = 1
+    layer.power_param.scale = 1-torch_layer["p"]
+    layer.power_param.shift = 0
+    return layer
 
 def fbthreshold(torch_layer):
     layer = pb2.LayerParameter()
@@ -282,6 +295,18 @@ def bn(torch_layer):
     return layer
 
 
+def batchnorm(torch_layer):
+    layer = pb2.LayerParameter()
+    layer.type = "BatchNorm"
+    # Caffe BN doesn't support bias
+    assert torch_layer["affine"]==0
+    layer.batch_norm_param.use_global_stats = 1
+    blobs_weight = np.ones(1)
+    layer.blobs.extend([as_blob(torch_layer["running_mean"]), 
+        as_blob(torch_layer["running_var"]), as_blob(blobs_weight)])
+    return layer
+
+
 def build_converter(opts):
     return {
         'caffe.Concat': concat,
@@ -299,11 +324,14 @@ def build_converter(opts):
         'caffe.SpatialConvolution': spatial_convolution,
         'caffe.Pooling': pooling,
         'caffe.Dropout': dropout,
+        'caffe.ELU': elu,
+        'caffe.Power': power,
         'caffe.Flatten': ty('Flatten'),
         'caffe.FBThreshold': fbthreshold,
         'caffe.LSTM': lstm,
         'caffe.Eltwise': eltwise,
         'caffe.BN': bn,
+        'caffe.BatchNorm': batchnorm,
     }
 
 
